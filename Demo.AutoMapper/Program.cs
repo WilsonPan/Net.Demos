@@ -11,7 +11,7 @@ namespace Demo
     {
         static void Main(string[] args)
         {
-
+            var str ="git";
             Mapper.Initialize(cfg =>
             {
                 cfg.AddMemberConfiguration();
