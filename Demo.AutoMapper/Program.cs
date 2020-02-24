@@ -7,8 +7,6 @@ namespace Demo
     {
         static void Main(string[] args)
         {
-            var str = "Hello World";
-
             var configuration = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Dto, Entity>()
