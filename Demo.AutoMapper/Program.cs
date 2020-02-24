@@ -1,29 +1,31 @@
 ﻿using System;
 using AutoMapper;
 
-namespace Demo.AutoMapper
+namespace Demo
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Mapper.Initialize(cfg =>
+            var configuration = new MapperConfiguration(cfg =>
             {
-                cfg.AddMemberConfiguration();
-
                 cfg.CreateMap<Dto, Entity>()
-                   .ForMember(dest => dest.CreateTime, opt => opt.MapFrom(src => new DateTime(DateTime.Now.Ticks)));
+                   .ForMember(dest => dest.CreateTime,
+                              opt => opt.MapFrom(src => new DateTime(DateTime.Now.Ticks)));
             });
-            try
-            {
-                var entity = Mapper.Map<Dto, Entity>(new Dto { Id = 1, Name = "Wilson", Hour = 12, Minute = 12, Second = 12 });
+            var mapper = configuration.CreateMapper();
 
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(entity));
-            }
-            catch (Exception ex)
+            var entity = mapper.Map<Entity>(new Dto
             {
-                Console.WriteLine(ex.Message);
-            }
+                Id = 1,
+                Name = "Wilson",
+                Hour = 12,
+                Minute = 12,
+                Second = 12
+            });
+
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(entity));
+
             Console.ReadKey(true);
         }
     }
