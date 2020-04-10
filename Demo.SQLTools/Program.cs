@@ -22,8 +22,8 @@ namespace Demo.SQLTools
 
             // Console.WriteLine(DecodeText(hexString, System.Text.Encoding.GetEncoding("gb2312")));
 
-            var hexString = "19010000";
-
+            var hexString = "416368 6f6e67b9 e3cef7ca a1d3f1c1 d6cad03000100002 0000006b 0d5386af ed400b04 00000200 1e002a00";
+            Console.WriteLine(hexString.Replace(" ", "").Length);
             Console.WriteLine($"Hex String : {hexString}");
 
             Console.WriteLine("Convert Int : " + BitConverter.ToInt32(HexToBytes(hexString), 0));
