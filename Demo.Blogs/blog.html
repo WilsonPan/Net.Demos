@@ -1,0 +1,190 @@
+<div class='ws-content'>
+    <p>AspNetCore源代码发现日志模块的设计模式（提供者模式），特此记录</p>
+</div>
+<p class="ws-title">类图 & 分析</p>
+<div class='ws-content'>
+    <p>正文</p>
+    <p><a href='https://upload-images.jianshu.io/upload_images/22730543-868560ff34b31fdc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240'
+            title='仅截取部分类&方法' target='_bank'>仅截取部分类&方法</a></p>
+    <p><strong>角色分析</strong></p>
+    <p><strong>日志工厂 （ LoggerFactory --> ILoggerFactory）</strong></p>
+    <p>- 提供注册提供者</p>
+    <p>- 创建日志记录器（Logger）</p>
+    <p><strong>日志记录器（Logger --> ILogger）</strong></p>
+    <p>- 写入日志记录（遍历所有日志提供者的Logger)</p>
+    <p>- 这里所有注册的日志提供者聚合</p>
+    <p><strong>日志提供者（ConsoleLoggerProvider --> ILoggerProvider）</strong></p>
+    <p>- 创建具体日志记录器</p>
+    <p><strong>具体日志记录者（ConsoleLogger，EventLogLogger）</strong></p>
+    <p>- 将日志写入具体媒介（控制台，Windows事件日志）</p>
+    <p>现在来看看这个模式</p>
+    <p>1. 提供标准的日志写入接口（ILogger）</p>
+    <p>2. 提供日志提供者接口（ILoggerProvider）</p>
+    <p>3. 提供注册提供者接口（ILoggerFactory.AddProvider）</p>
+    <p>这里只是列出部分类和方法，整个Logging要比这个还多，为什么写个日志要整那么多东西？</p>
+    <p>程序唯一不会变就是不断在变化，这个也是为什么要设计模式运用到程序当中的原因，让程序可扩展来应对这种变化。</p>
+    <p><a href='https://docs.microsoft.com/zh-cn/aspnet/core/fundamentals/logging/?view=aspnetcore-3.1#built-in-logging-providers'
+            title='8种日志记录提供程序' target='_bank'>8种日志记录提供程序</a></p>
+    <p>假设现在需要把日志写在Mongo，只需要</p>
+    <p>1. 实现Mongodb的ILogger - 将日志写到Mongodb</p>
+    <p>2. 实现Mongodb的ILoggerProvider - 创建Mongodb的Logger</p>
+    <p>3. 把Provider注册到AspNetCore - ILoggerFactory.AddProvider</p>
+    <p>这里都是新增代码达到实现把日志写入到Mongodb，这就是6大设计原则之一对扩展开放（可以添加自己的日志），对修改封闭（不需要修改到内部的方法）</p>
+    <p><strong>AspNetCore代码实现（只列出接口）</strong></p>
+    <p><strong>ILoggerFactory</strong></p>
+    <p style='color:red'>todo : 代码 </p>
+    <p style='color:red'>todo : 代码 </p>
+    <p style='color:red'>todo : 代码 </p>
+    <p> ILogger CreateLogger(string categoryName);</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p><strong>ILogger</strong></p>
+    <p style='color:red'>todo : 代码 </p>
+    <p style='color:red'>todo : 代码 </p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public ILogger CreateLogger(string categoryName)</p>
+    <p> =&gt; this.loggers.GetOrAdd(categoryName, this.CreateLoggerImplementation);</p>
+    <p>private Log4NetLogger CreateLoggerImplementation(string name)</p>
+    <p>{</p>
+    <p> var options = new Log4NetProviderOptions</p>
+    <p> {</p>
+    <p> Name = name,</p>
+    <p> LoggerRepository = this.loggerRepository.Name</p>
+    <p> };</p>
+    <p> options.ScopeFactory = new Log4NetScopeFactory(new Log4NetScopeRegistry());</p>
+    <p> return new Log4NetLogger(options);</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>switch (logLevel)</p>
+    <p> {</p>
+    <p> case LogLevel.None:</p>
+    <p> break;</p>
+    <p> case LogLevel.Critical:</p>
+    <p> {</p>
+    <p> string overrideCriticalLevelWith = options.OverrideCriticalLevelWith;</p>
+    <p> if (!string.IsNullOrEmpty(overrideCriticalLevelWith) &amp;&amp;
+        overrideCriticalLevelWith.Equals(LogLevel.Critical.ToString(), StringComparison.OrdinalIgnoreCase))</p>
+    <p> {</p>
+    <p> log.Critical(text, exception);</p>
+    <p> }</p>
+    <p> else</p>
+    <p> {</p>
+    <p> log.Fatal(text, exception);</p>
+    <p> }</p>
+    <p> break;</p>
+    <p> }</p>
+    <p> case LogLevel.Debug:</p>
+    <p> log.Debug(text, exception);</p>
+    <p> break;</p>
+    <p> case LogLevel.Error:</p>
+    <p> log.Error(text, exception);</p>
+    <p> break;</p>
+    <p> case LogLevel.Information:</p>
+    <p> log.Info(text, exception);</p>
+    <p> break;</p>
+    <p> case LogLevel.Warning:</p>
+    <p> log.Warn(text, exception);</p>
+    <p> break;</p>
+    <p> case LogLevel.Trace:</p>
+    <p> log.Trace(text, exception);</p>
+    <p> break;</p>
+    <p> default:</p>
+    <p> log.Warn($&quot;Encountered unknown log level {logLevel}, writing out as Info.&quot;);</p>
+    <p> log.Info(text, exception);</p>
+    <p> break;</p>
+    <p> }</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>loggerFactory.AddLog4Net(new Log4NetProviderOptions()</p>
+    <p>{</p>
+    <p> OverrideCriticalLevelWith = &quot;Critical&quot;</p>
+    <p>});</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p> _logger.LogCritical(&quot;Log Critical&quot;);</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>2020-04-27 13:42:05,042 [10] FATAL LoggingPattern.Controllers.WeatherForecastController (null) - Log Critical</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>&lt;SignAssembly&gt;false&lt;/SignAssembly&gt;</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p> &lt;ItemGroup&gt;</p>
+    <p> &lt;ProjectReference
+        Include=&quot;..\Microsoft.Extensions.Logging.Log4Net.AspNetCore\src\Microsoft.Extensions.Logging.Log4Net.AspNetCore\Microsoft.Extensions.Logging.Log4Net.AspNetCore.csproj&quot;
+        /&gt;</p>
+    <p> &lt;/ItemGroup&gt;</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>builder.Services.AddSingleton&lt;ILoggerProvider&gt;(new Log4NetProvider(options));</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public Log4NetProvider(Log4NetProviderOptions options)</p>
+    <p>{</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public ILogger CreateLogger(string categoryName)</p>
+    <p> =&gt; this.loggers.GetOrAdd(categoryName, this.CreateLoggerImplementation);</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>private Log4NetLogger CreateLoggerImplementation(string name)</p>
+    <p>{</p>
+    <p> var options = new Log4NetProviderOptions</p>
+    <p> {</p>
+    <p> Name = name,</p>
+    <p> LoggerRepository = this.loggerRepository.Name</p>
+    <p> };</p>
+    <p> options.ScopeFactory = new Log4NetScopeFactory(new Log4NetScopeRegistry());</p>
+    <p> return new Log4NetLogger(options);</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>dotnet add package MongoDB.Driver</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public class MongodbLogger : ILogger</p>
+    <p>{</p>
+    <p> private readonly string _name;</p>
+    <p> private MongoDB.Driver.IMongoDatabase _database;</p>
+    <p> public MongodbLogger(string name, MongoDB.Driver.IMongoDatabase database)</p>
+    <p> {</p>
+    <p> _name = name;</p>
+    <p> _database = database;</p>
+    <p> }</p>
+    <p> public void Log&lt;TState&gt;(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+        Func&lt;TState, Exception, string&gt; formatter)</p>
+    <p> {</p>
+    <p> var collection = _database.GetCollection&lt;dynamic&gt;(logLevel.ToString().ToLower());</p>
+    <p> string message = formatter(state, exception);</p>
+    <p> collection.InsertOneAsync(new</p>
+    <p> {</p>
+    <p> time = DateTime.Now,</p>
+    <p> name = _name,</p>
+    <p> message,</p>
+    <p> exception</p>
+    <p> });</p>
+    <p> }</p>
+    <p> public bool IsEnabled(LogLevel logLevel) =&gt; logLevel != LogLevel.None;</p>
+    <p> public System.IDisposable BeginScope&lt;TState&gt;(TState state) =&gt; NullScope.Instance;</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public class MongodbProvider : ILoggerProvider</p>
+    <p>{</p>
+    <p> private readonly ConcurrentDictionary&lt;string, MongodbLogger&gt; _loggers = new
+        ConcurrentDictionary&lt;string, MongodbLogger&gt;();</p>
+    <p> private MongoDB.Driver.IMongoDatabase _database;</p>
+    <p> public MongodbProvider(MongoDB.Driver.IMongoDatabase database)</p>
+    <p> {</p>
+    <p> _database = database;</p>
+    <p> }</p>
+    <p> public ILogger CreateLogger(string categoryName)</p>
+    <p> =&gt; _loggers.GetOrAdd(categoryName, name =&gt; new MongodbLogger(categoryName, this._database));</p>
+    <p> public void Dispose() =&gt; this._loggers.Clear();</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>public static ILoggerFactory AddMongodb(this ILoggerFactory factory, string connetionString =
+        &quot;mongodb://127.0.0.1:27017/logging&quot;)</p>
+    <p>{</p>
+    <p> var mongoUrl = new MongoDB.Driver.MongoUrl(connetionString);</p>
+    <p> var client = new MongoDB.Driver.MongoClient(mongoUrl);</p>
+    <p> factory.AddProvider(new MongodbProvider(client.GetDatabase(mongoUrl.DatabaseName)));</p>
+    <p> return factory;</p>
+    <p>}</p>
+    <p style='color:red'>todo : 代码 </p>
+    <p>loggerFactory.AddMongodb();</p>
+</div>
+<div class="ws-content">
+    <div class="ws-copyright">
+        <p>转发请标明出处：https://www.cnblogs.com/WilsonPan/p/12704474.html</p>
+    </div>
+</div>
