@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Running;
 
 namespace Demo.BenchmarkDotNet
@@ -7,37 +9,33 @@ namespace Demo.BenchmarkDotNet
     {
         static void Main(string[] args)
         {
-            var appDomain = System.Threading.Thread.GetDomain();
+            //var summary = BenchmarkRunner.Run<QuickSortVsHeapSort>();
 
-            var ad = AppDomain.CreateDomain("Ad #2", null, null);
-
-            var asy = System.Reflection.Assembly.LoadFile(@"F:\GitHub\Me\Net.Demos\Demo.Hot\bin\Debug\netstandard2.0\Demo.Hot.dll");
-
-            var obj = ad.CreateInstanceAndUnwrap(asy.FullName, "Demo.Hot.Runner");
-
-            var method = obj.GetType().GetMethod("Execute");
-
-            var returnValue = method.Invoke(obj, null);
-
-            Console.WriteLine(returnValue);
-
-            foreach (var assembly in ad.GetAssemblies())
+            var random = new Random();
+            var datas = Enumerable.Range(1, 10000).ToArray();
+            for (int i = datas.Length - 1; i > 0; i--)
             {
-                Console.WriteLine($"{assembly.FullName}");
+                datas[i] = random.Next(1, 10000000);
             }
 
-            AppDomain.Unload(ad);
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
-        }
-    }
+            sw.Start();
 
-    public class Person : MarshalByRefObject
-    {
-        public string Name { get; set; }
+            Demo.BenchmarkDotNet.QuickSort.Sort(datas.Clone() as int[]);
 
-        public string GetName()
-        {
-            return "Wilson Pan";
+            Console.WriteLine($"QuickSort : {sw.ElapsedMilliseconds}");
+
+            sw.Restart();
+            Demo.BenchmarkDotNet.BubbleSort.Sort(datas.Clone() as int[]);
+
+            Console.WriteLine($"BubbleSort : {sw.ElapsedMilliseconds}");
+
+            sw.Restart();
+            Demo.BenchmarkDotNet.HeapSort.Sort(datas.Clone() as int[]);
+
+            Console.WriteLine($"HeapSort : {sw.ElapsedMilliseconds}");
+
         }
     }
 }

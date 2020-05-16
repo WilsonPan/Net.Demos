@@ -20,7 +20,7 @@ namespace Demo.RabbitMQ
 
             byte[] messageBodyBytes = System.Text.Encoding.UTF8.GetBytes("Hello, world! " + DateTime.Now);
             model.BasicPublish("", "Wilson", null, messageBodyBytes);
-
+                
             conn.Dispose();
             model.Dispose();
 
