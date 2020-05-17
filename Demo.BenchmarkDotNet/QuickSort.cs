@@ -2,8 +2,6 @@ namespace Demo.BenchmarkDotNet
 {
     public class QuickSort
     {
-        public static void Sort(int[] nums) => Sort(nums, 0, nums.Length - 1);
-
         public static void Sort(int[] nums, int left, int right)
         {
             //1. 赋值到临时变量，需要保留原始值递归

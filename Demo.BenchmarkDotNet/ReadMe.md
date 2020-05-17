@@ -144,24 +144,33 @@ public class QuickSortVsHeapSort
 public void BubbleSort(int[] nums) => Demo.BenchmarkDotNet.BubbleSort.Sort(nums);
 ```
 
-运行结果
-```cs
-|     Method |         nums |          Mean |       Error |      StdDev | Ratio | 
-|----------- |------------- |--------------:|------------:|------------:|------:|
-|  QuickSort | Int32[10000] | 35,368.417 us | 664.6237 us | 518.8945 us | 0.550 |
-|   HeapSort | Int32[10000] |    716.555 us |   2.6473 us |   2.0668 us | 0.011 |
-| BubbleSort | Int32[10000] | 64,248.056 us | 195.7579 us | 163.4667 us | 1.000 |
-|  QuickSort |  Int32[1000] |    400.192 us |   0.9181 us |   0.7667 us | 0.006 |
-|   HeapSort |  Int32[1000] |     56.590 us |   0.2058 us |   0.1718 us | 0.001 |
-| BubbleSort |  Int32[1000] |    657.529 us |   1.8867 us |   1.4730 us | 0.010 |
-|  QuickSort |   Int32[100] |      4.873 us |   0.0256 us |   0.0214 us | 0.000 |
-|   HeapSort |   Int32[100] |      2.448 us |   0.0123 us |   0.0115 us | 0.000 |
-| BubbleSort |   Int32[100] |      7.183 us |   0.0256 us |   0.0214 us | 0.000 |
+### 使用BenchmarkDotNet 模板
+
+1. 安装模板
+   
+``` cs
+dotnet new -i BenchmarkDotNet.Templates
 ```
 
-可以看到，堆排序相比快速排序和冒泡排序有明显的优势
+2. 创建模板
+
+``` cs
+dotnet new benchmark
+```
 
 
+### 使用BenchmarkDotNet dotnet tool
 
+1. 安装
+  
+``` cs
+dotnet tool install -g BenchmarkDotNet.Tool
+```
 
+2. 使用
+  
+``` cs
+dotnet benchmark [arguments] [options]
+```
 
+# 
