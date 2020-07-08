@@ -8,7 +8,7 @@ using MongoDB.Driver;
 
 namespace Demo.Mongodb
 {
-    public class MongoRepository
+    public class MongoRepository : IRepository
     {
         private static IConfigurationRoot _configuration;
         private static IMongoClient _client;
@@ -36,28 +36,20 @@ namespace Demo.Mongodb
 
         public FilterDefinition<BsonDocument> GetEmptyFilters() => FilterDefinition<BsonDocument>.Empty;
 
-        public IFindFluent<BsonDocument, BsonDocument> Find(string name, FilterDefinition<BsonDocument> filters = null, SortDefinition<BsonDocument> sort = null)
-        {
-            filters = filters ?? FilterDefinition<BsonDocument>.Empty;
-
-            return _database.GetCollection<BsonDocument>(name)
-                            .Find(filters)
-                            .Sort(sort);
-        }
         public Task<BsonDocument> FirstOrDefaultAsync(string name, FilterDefinition<BsonDocument> filters = null, SortDefinition<BsonDocument> sort = null)
         {
             return Find(name, filters, sort).FirstOrDefaultAsync();
         }
 
         public Task<PageListResult> PageList(string name,
-                                                 FilterDefinition<BsonDocument> filters = null,
-                                                 SortDefinition<BsonDocument> sort = null,
-                                                 int offset = 0,
-                                                 int limit = 10)
+                                             FilterDefinition<BsonDocument> filters = null,
+                                             SortDefinition<BsonDocument> sort = null,
+                                             int offset = 0,
+                                             int limit = 10)
         {
             var pageTask = Find(name, filters, sort).Skip(offset)
-                                                .Limit(limit)
-                                                .ToListAsync();
+                                                    .Limit(limit)
+                                                    .ToListAsync();
 
             var countTask = Find(name, filters).CountDocumentsAsync();
 
@@ -68,6 +60,16 @@ namespace Demo.Mongodb
                 Total = countTask.Result,
                 PageList = pageTask.Result
             });
+        }
+
+        private IFindFluent<BsonDocument, BsonDocument> Find(string name, FilterDefinition<BsonDocument> filters = null, SortDefinition<BsonDocument> sort = null)
+        {
+            filters = filters ?? FilterDefinition<BsonDocument>.Empty;
+
+            return _database.GetCollection<BsonDocument>(name)
+                            .Find(filters)
+                            .Sort(sort);
+
         }
     }
 }
