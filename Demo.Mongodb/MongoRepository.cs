@@ -35,10 +35,9 @@ namespace Demo.Mongodb
 
         public FilterDefinition<BsonDocument> GetEmptyFilters() => FilterDefinition<BsonDocument>.Empty;
 
-
-        public Task<T> FirstOrDefaultAsync<T>(string name, FilterDefinition<T> filters)
+        public Task<BsonDocument> FirstOrDefaultAsync(string name, FilterDefinition<BsonDocument> filters)
         {
-            return _database.GetCollection<T>(name)
+            return _database.GetCollection<BsonDocument>(name)
                             .Find(filters)
                             .FirstOrDefaultAsync();
         }
