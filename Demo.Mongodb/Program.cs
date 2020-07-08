@@ -16,7 +16,7 @@ namespace Demo.Mongodb
 
             var data = await repository.FirstOrDefaultAsync("col", filters);
 
-            Console.WriteLine(data["Name"]);
+            Console.WriteLine(data?["Name"]);
         }
     }
 }
