@@ -33,3 +33,20 @@ var data = await repository.FirstOrDefaultAsync("col", filters);
 Console.WriteLine(data["Name"]);
 
 ```
+
+- PageList
+
+```cs
+
+// definition filters
+var filters =  repository.Builder.Gt("age", 18);
+filters &= repository.Builder.Eq("sex",true);
+
+// get page list
+var result = await repository.PageList(name: "col",
+                                       filters: filters,
+                                       sort: new BsonDocument("timestamp", -1));
+
+// get data
+Console.WriteLine($"{result.Total}, {result.PageList.ToJson()}");
+```
