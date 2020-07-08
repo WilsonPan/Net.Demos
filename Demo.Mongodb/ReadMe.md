@@ -50,3 +50,7 @@ var result = await repository.PageList(name: "col",
 // get data
 Console.WriteLine($"{result.Total}, {result.PageList.ToJson()}");
 ```
+
+## Issues
+
+- [ ] Repository public method dependency mongo driver implementation. eg. FilterDefinition<BsonDocument>
