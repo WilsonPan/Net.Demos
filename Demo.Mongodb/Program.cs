@@ -10,11 +10,9 @@ namespace Demo.Mongodb
         static async Task Main(string[] args)
         {
             var repository = new MongoRepository();
-            var builder = Builders<BsonDocument>.Filter;
 
-            var filters = FilterDefinition<BsonDocument>.Empty;
-
-            filters &= builder.Eq("Age", 18);
+            var filters =  repository.Builder.Gt("age", 18);
+            filters &= repository.Builder.Eq("sex",true);
 
             var data = await repository.FirstOrDefaultAsync("col", filters);
 
