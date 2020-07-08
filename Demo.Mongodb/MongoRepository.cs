@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -35,11 +36,38 @@ namespace Demo.Mongodb
 
         public FilterDefinition<BsonDocument> GetEmptyFilters() => FilterDefinition<BsonDocument>.Empty;
 
-        public Task<BsonDocument> FirstOrDefaultAsync(string name, FilterDefinition<BsonDocument> filters)
+        public IFindFluent<BsonDocument, BsonDocument> Find(string name, FilterDefinition<BsonDocument> filters = null, SortDefinition<BsonDocument> sort = null)
         {
+            filters = filters ?? FilterDefinition<BsonDocument>.Empty;
+
             return _database.GetCollection<BsonDocument>(name)
                             .Find(filters)
-                            .FirstOrDefaultAsync();
+                            .Sort(sort);
+        }
+        public Task<BsonDocument> FirstOrDefaultAsync(string name, FilterDefinition<BsonDocument> filters = null, SortDefinition<BsonDocument> sort = null)
+        {
+            return Find(name, filters, sort).FirstOrDefaultAsync();
+        }
+
+        public Task<PageListResult> PageList(string name,
+                                                 FilterDefinition<BsonDocument> filters = null,
+                                                 SortDefinition<BsonDocument> sort = null,
+                                                 int offset = 0,
+                                                 int limit = 10)
+        {
+            var pageTask = Find(name, filters, sort).Skip(offset)
+                                                .Limit(limit)
+                                                .ToListAsync();
+
+            var countTask = Find(name, filters).CountDocumentsAsync();
+
+            Task.WaitAll(pageTask, countTask);
+
+            return Task.FromResult(new PageListResult()
+            {
+                Total = countTask.Result,
+                PageList = pageTask.Result
+            });
         }
     }
 }
