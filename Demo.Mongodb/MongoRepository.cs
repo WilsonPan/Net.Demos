@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Demo.Mongodb
@@ -29,6 +30,11 @@ namespace Demo.Mongodb
 
             _database = _client.GetDatabase(mongoUrl.DatabaseName);
         }
+
+        public FilterDefinitionBuilder<BsonDocument> Builder => Builders<BsonDocument>.Filter;
+
+        public FilterDefinition<BsonDocument> GetEmptyFilters() => FilterDefinition<BsonDocument>.Empty;
+
 
         public Task<T> FirstOrDefaultAsync<T>(string name, FilterDefinition<T> filters)
         {
