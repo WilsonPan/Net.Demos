@@ -7,12 +7,17 @@ namespace Demo.RedisCluster
 {
     class Program
     {
-        static readonly string configString = "127.0.0.1:6383";
+        static readonly string configString = "127.0.0.1:6379;127.0.0.1:6380";
         static void Main(string[] args)
         {
-            var client = ConnectionMultiplexer.Connect(configString);
+            ConfigurationOptions options = new ConfigurationOptions
+            {
+                EndPoints = { { "127.0.0.1", 6379 }, { "127.0.0.1", 6380 }, { "127.0.0.1", 6381 } }
+            };
 
-            // RedisStringOperation(client);
+            var client = ConnectionMultiplexer.Connect(options);
+
+            RedisStringOperation(client);
 
             // RedisHashOperation(client);
 
@@ -20,7 +25,7 @@ namespace Demo.RedisCluster
 
             // RedisSetOperation(client);
 
-            RedisSortedSetOperation(client);
+            // RedisSortedSetOperation(client);
 
             client.Dispose();
         }

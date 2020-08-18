@@ -173,4 +173,6 @@ dotnet tool install -g BenchmarkDotNet.Tool
 dotnet benchmark [arguments] [options]
 ```
 
-# 
+---
+转载请标明出处 : [https://www.cnblogs.com/WilsonPan/p/12904664.html](https://www.cnblogs.com/WilsonPan/p/12904664.html)
+[示例源码](https://github.com/WilsonPan/Net.Demos/tree/master/Demo.BenchmarkDotNet)
