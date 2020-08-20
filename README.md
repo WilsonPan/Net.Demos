@@ -14,3 +14,6 @@
 
 [Demo.SQLTools](/Demo.SQLTools/)
 > 解析SQL Server 存储格式
+
+[Demo.StreamWriter](/Demo.StreamWriter/)
+> StreamWriter.Write 的一点注意事项
