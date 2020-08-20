@@ -261,11 +261,12 @@ dotnet build && sudo dotnet benchmark bin/Release/netstandard2.0/BenchmarksTests
 # 总结
 
 1. `StreamWriter` 默认是没有BOM，若指定`System.Text.Encoding.UTF8`，会在`Flush`字节数组开头添加BOM
-2. 字符串转换字节数组使用`System.Text.Encoding.UTF8.GetBytes` 要高效
+2. 字符串转换字节数组使用`System.Text.Encoding.UTF8.GetBytes` 要高效
 3. `System.Text.Encoding.UTF8.GetBytes` 是不会自己添加BOM，提供`Encoding.UTF8.GetPreamble()`获取BOM
 4. UTF8 已经不推荐推荐在前面加BOM
 
 ---
 
-转发请标明出处：[https://www.cnblogs.com/WilsonPan/p/13524885.html](https://www.cnblogs.com/WilsonPan/p/13524885.html)
+转发请标明出处：[https://www.cnblogs.com/WilsonPan/p/13524885.html](https://www.cnblogs.com/WilsonPan/p/13524885.html)  
+
 [示例代码](https://github.com/WilsonPan/Net.Demos/tree/master/Demo.StreamWriter)
