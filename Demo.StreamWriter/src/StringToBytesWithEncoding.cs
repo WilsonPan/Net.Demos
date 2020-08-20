@@ -1,13 +1,10 @@
 using System;
 using System.Text;
-using BenchmarkDotNet.Attributes;
 
 namespace Demo.StreamWriter
 {
-    public class StringToBytesWithEncoding
+    public static class StringToBytesWithEncoding
     {
-        [Benchmark]
-        [Arguments("Hello World! Wilson , 深度了解咖啡")]
         public static byte[] StringToBytes(string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));

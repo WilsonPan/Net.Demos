@@ -1,12 +1,9 @@
 using System;
-using BenchmarkDotNet.Attributes;
 
 namespace Demo.StreamWriter
 {
-    public class StringToBytesWithStream
+    public static class StringToBytesWithStream
     {
-        [Benchmark]
-        [Arguments("Hello World! Wilson , 深度了解咖啡")]
         public static byte[] StringToBytes(string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));

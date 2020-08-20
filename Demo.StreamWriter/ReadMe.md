@@ -213,11 +213,59 @@ public static byte[] StringToBytes(string value)
 排除了`StreamWriter`没有做特殊处理，可以用`System.Text.Encoding.UTF8.GetBytes()`重构。还有就是效率问题，虽然直观上看到使用`StreamWriter` 最终都是使用`Encoder.GetBytes` 方法，而且还多了两次资源对申请和释放。但是还是用基准测试才能直观看出其中差别。
 基准测试使用BenchmarkDotNet，[BenchmarkDotNet](https://www.cnblogs.com/WilsonPan/p/12904664.html)这里之前有介绍过
 
-1. 添加BenchmarkDotNet
+1. 创建`BenchmarksTests`目录并创建基准项目
 
 ```cs
-dotnet add package BenchmarkDotNet
+mkdir BenchmarksTests && cd BenchmarksTests &&  dotnet new benchmark -b StreamVsEncoding
 ```
 
-2. 
+2. 添加引用
+```cs
+dotnet add reference ../../src/Demo.StreamWriter.csproj
+```
+> **注意**：Demo.StreamWriter需要Release编译
 
+3. 编写基准测试
+```cs
+[SimpleJob(launchCount: 10)]
+[MemoryDiagnoser]
+public class StreamVsEncoding
+{
+    [Params("Hello Wilson!", "使用【BenchmarkDotNet】基准测试，Encoding vs Stream")]
+    public string _stringValue;
+
+    [Benchmark] public void Encoding() => StringToBytesWithEncoding.StringToBytes(_stringValue);
+
+    [Benchmark] public void Stream() => StringToBytesWithStream.StringToBytes(_stringValue);
+}
+```
+
+4. 编译 && 运行基准测试
+
+```cs
+dotnet build && sudo dotnet benchmark bin/Release/netstandard2.0/BenchmarksTests.dll --filter 'StreamVsEncoding'
+```
+> **注意**：macos 需要sudo权限
+
+5. 查看结果
+
+| Method   | _stringValue            |     Mean |   Error |   StdDev |   Median |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+| -------- | ----------------------- | -------: | ------: | -------: | -------: | -----: | ----: | ----: | --------: |
+| Encoding | Hello Wilson!           | 107.4 ns | 0.61 ns |  2.32 ns | 106.9 ns | 0.0355 |     - |     - |     112 B |
+| Stream   | Hello Wilson!           | 565.1 ns | 4.12 ns | 18.40 ns | 562.3 ns | 1.8196 |     - |     - |    5728 B |
+| Encoding | 使用【Be(...)tream [42] | 166.3 ns | 1.00 ns |  3.64 ns | 165.4 ns | 0.0660 |     - |     - |     208 B |
+| Stream   | 使用【Be(...)tream [42] | 584.6 ns | 3.65 ns | 13.22 ns | 580.8 ns | 1.8349 |     - |     - |    5776 B |
+
+执行时间相差了4～5倍， 内存使用率相差 20 ～ 50倍，差距还比较大。
+
+# 总结
+
+1. `StreamWriter` 默认是没有BOM，若指定`System.Text.Encoding.UTF8`，会在`Flush`字节数组开头添加BOM
+2. 字符串转换字节数组使用`System.Text.Encoding.UTF8.GetBytes` 要高效
+3. `System.Text.Encoding.UTF8.GetBytes` 是不会自己添加BOM，提供`Encoding.UTF8.GetPreamble()`获取BOM
+4. UTF8 已经不推荐推荐在前面加BOM
+
+---
+
+转发请标明出处：[https://www.cnblogs.com/WilsonPan/p/13524885.html](https://www.cnblogs.com/WilsonPan/p/13524885.html)
+[示例代码](https://github.com/WilsonPan/Net.Demos/tree/master/Demo.StreamWriter)
