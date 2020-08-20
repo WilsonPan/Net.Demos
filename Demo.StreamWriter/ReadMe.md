@@ -267,6 +267,5 @@ dotnet build && sudo dotnet benchmark bin/Release/netstandard2.0/BenchmarksTests
 
 ---
 
-转发请标明出处：[https://www.cnblogs.com/WilsonPan/p/13524885.html](https://www.cnblogs.com/WilsonPan/p/13524885.html)  
-
+转发请标明出处：[https://www.cnblogs.com/WilsonPan/p/13524885.html](https://www.cnblogs.com/WilsonPan/p/13524885.html)  
 [示例代码](https://github.com/WilsonPan/Net.Demos/tree/master/Demo.StreamWriter)
